@@ -1,0 +1,28 @@
+DFE analysis using SVs data from wild relative and peach cultivars:
+polyDFE-2.0/polyDFE-2.0-linux-64-bit -d pop.nsnps.sfs -m A -e -b > pop.dfe
+# DFE bootstrap 
+# R command
+source("polyDFE-2.0/postprocessing.R")
+bootstrapData("pop.nsnps.sfs", rep = 100)
+
+Pi value using SNPs or SVs data:
+vcftools --vcf vcf.file --window-pi window.size --out prefix.out
+
+Admixture using SNPs or SVs data:
+admixture -B1000 -j40 --cv $input $K | tee log$K.out
+
+PCA using SNPs or SVs data:
+convertf -p transfer.conf
+smartpca -p runpca.conf
+
+Phylogenetic tree using SNPs or SVs data:
+FastTreeMP -nt -gtr -gamma -log log.file SNP.msa > SNP.FastTreeMP.out
+
+GWAS using SNPs InDels or SVs data using EMMAX:
+1.Convert VCF file into tped format:
+plink --vcf vcf.file --make-bed --allow-extra-chr --out prefix1
+plink --bfile prefix1 --recode12 --transpose --out prefix2
+2.Build kinship matrix:
+emmax-kin-intel64 -v -d 10 prefix2
+3.Perform GWAS based on kinship and traits.
+emmax-intel64 -v -d 10 -t prefix2 -p Phenotypes.file -k prefix2.kinf -o prefix3
