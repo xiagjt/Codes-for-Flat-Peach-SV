@@ -1,0 +1,9 @@
+Do DNA sequence alignment between Lovell v2.0 and RYP1 genome assemblies using Mummer:
+1.	nucmer --prefix prefix1 -t 160 -g 1000 -l 40 -c 90 ref1.fa ref2.fa
+2.	delta-filter -1 -q -r prefix1.delta > prefix1.filter
+3.	show-coords -rclT prefix1.filter > prefix1.coords
+
+Perform gene family analysis basedon protein sequences using OrthoFinder:
+Putting  Lovell v2.0 and RYP1 protein fasta files into one directory (seq.dir)
+1. orthofinder -f seq.dir
+2. Extracting Specie-specific gene family using perl
