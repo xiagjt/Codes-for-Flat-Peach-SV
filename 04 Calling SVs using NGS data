@@ -1,0 +1,17 @@
+SV calling using NGS data:
+1.Bams files as same as ones generatde by BWA in the SNPs calling step.
+2.Calling SVs for individual sample one by one using Manta software according to the default pipeline:
+python configManta.py –bam bam.file --runDir target.dir --referenceFasta RYP1.fa
+python runWorkflow.py
+The SV file was in the result directory.
+3.Merging filtered SVs:
+Extract SVs with "PASS" tag in the result VCF file
+ls *SV.filtered.vcf > SV.file.list
+SURVIVOR merge SV.file.list 100 1 1 1 0 30 merged.vcf
+4.Genotyping of all samples one by one based on one referece SV set using bam files:
+Install Paragraph software using conda
+idxdepth -b bam.file -o out.dir -r RYP1.fa --threads 40
+multigrmpy.py --threads 20 -i merged.vcf -m config.file -r RYP1.fa -o out.dir
+5.Merging all genotyped VCF files using SURVIVOR software.
+
+
