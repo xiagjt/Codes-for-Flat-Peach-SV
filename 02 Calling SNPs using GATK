@@ -1,0 +1,21 @@
+SNP calling using NGS data:
+First intall BWA, samtools, GATK and annovar software using conda
+1.Mapping clean reads of individual sample onto RYP1 genome sequence one by one:
+bwa index RYP1.fa
+bwa mem -t 20 -R '@RG\tID:RYP1ID\tSM:RYP1' RYP1 fq1 fq2 | samtools view -@ 20 -bh - | samtools sort -@ 20 -T test -o bam.sample.file - 
+2.Calling SNPs and InDels for individual sample one by one:
+gatk HaplotypeCaller -R RYP1.fa –emit-ref-confidence GVCF -I bam.sample.file -O GVCF.sample.file
+3.Megre GVCF files from all samles using GATK into one GVCF file and convert GVCF into VCF file:
+gatk CombineGVCFs -R RYP2.fa -V GVCF.samlpe.vcf -V GVCF.samlpe1.vcf -V GVCF.samlpe2.vcf -V... -O vcf.multiple.file.gvcf
+gatk GenotypeGVCFs -R RYP2.fa -V vcf.multiple.file.gvcf -O vcf.multiple.file.vcf
+4.Filtered SNP VCF
+vcftools --vcf vcf.multiple.file.vcf --recode --maf 0.05 --max-missing 0.5 --out filter.vcf
+5.Annotate SNP function using ANNOVAR software:
+gtfToGenePred.txt -genePredExt RYP1.gtf Database.dir/RYP1_refGene.txt
+perl retrieve_seq_from_fasta.pl --format refGene --seqfile RYP1.fa RYP1_refGene.txt --out Database.dir/RYP1_refGeneMrna.fa
+table_annovar.pl filter.vcf Database.dir/ -buildver RYP1  -out prefix -remove -protocol refGene -operation g -nastring . -vcfinput
+
+
+
+
+
